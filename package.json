@@ -2,7 +2,7 @@
   "name": "calendareventapp",
   "license": "0BSD",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -27,7 +27,9 @@
     "react-native-gesture-handler": "~2.20.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "typescript": "^5.3.3",
+    "@types/react": "~18.3.12"
   },
   "private": true
 }
