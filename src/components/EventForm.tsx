@@ -72,7 +72,7 @@ const EventForm: React.FC<EventFormProps> = ({
       <CustomSelect 
         value={repeatOption} 
         onValueChange={setRepeatOption} 
-        options={["Every Day", "Every Week", "Every Year"]}
+        options={["Weekly", "Bi-weekly", "Monthly"]}
       />
       <TouchableOpacity style={styles.saveButton} onPress={onSave}>
         <Text style={styles.saveButtonText}>Save</Text>

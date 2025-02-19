@@ -9,24 +9,33 @@ export interface Event {
   date: string;
 }
 
-const initialState: Event[] = [];
+interface EventsState {
+  events: Event[];
+}
+
+const initialState: EventsState = {
+  events: [],
+};
 
 const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    setEvents: (state, action: PayloadAction<Event[]>) => action.payload,
+    setEvents: (state, action: PayloadAction<Event[]>) => {
+      state.events = action.payload;
+    },
     addEvent: (state, action: PayloadAction<Event>) => {
-      state.push(action.payload);
+      state.events.push(action.payload);
     },
     editEvent: (state, action: PayloadAction<Event>) => {
-      const index = state.findIndex(ev => ev.id === action.payload.id);
+      const index = state.events.findIndex(ev => ev.id === action.payload.id);
       if (index !== -1) {
-        state[index] = action.payload;
+        state.events[index] = action.payload;
       }
     },
-    deleteEvent: (state, action: PayloadAction<string>) =>
-      state.filter(ev => ev.id !== action.payload),
+    deleteEvent: (state, action: PayloadAction<string>) => {
+      state.events = state.events.filter(ev => ev.id !== action.payload);
+    },
   },
 });
 

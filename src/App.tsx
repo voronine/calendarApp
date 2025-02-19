@@ -14,17 +14,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { format, parseISO, addDays, startOfWeek, addHours } from 'date-fns';
 
-import { store } from './store/store';
-import { setEvents, addEvent, editEvent, deleteEvent, Event } from './store/eventsSlice';
+import { store, persistor } from './store/store';
+import { addEvent, editEvent, deleteEvent, Event } from './store/eventsSlice';
 import CalendarComponent from './components/CalendarComponent';
 import EventForm from './components/EventForm';
 import EventList from './components/EventList';
+import { PersistGate } from 'redux-persist/integration/react';
 
 const Stack = createNativeStackNavigator();
 
 const MainScreen: React.FC = () => {
   const dispatch = useDispatch();
-  const events = useSelector((state: any) => state.events) as Event[];
+  const events = useSelector((state: any) => state.events.events) as Event[];
 
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [viewMode, setViewMode] = useState<'calendar' | 'day'>('calendar');
@@ -40,7 +41,7 @@ const MainScreen: React.FC = () => {
       ? format(addHours(new Date(), 1), 'HH:00')
       : '15:00'
   );
-  const [repeatOption, setRepeatOption] = useState('Every Day');
+  const [repeatOption, setRepeatOption] = useState('Weekly');
   const [isEditing, setIsEditing] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
@@ -83,7 +84,7 @@ const MainScreen: React.FC = () => {
       setStartTime('15:00');
       setEndTime('15:00');
     }
-    setRepeatOption('Every Day');
+    setRepeatOption('Weekly');
     setIsEditing(false);
     setEditingEventId(null);
   };
@@ -146,7 +147,9 @@ const MainScreen: React.FC = () => {
           </TouchableOpacity>
           <View style={styles.weekNavigationContainer}>
             <TouchableOpacity onPress={() => setSelectedDate(format(addDays(parseISO(selectedDate), -1), 'yyyy-MM-dd'))}>
-              <Text style={styles.arrowButton}>◀</Text>
+              <View style={styles.squareButton}>
+                <Text style={styles.squareBracket}>{'<'}</Text>
+              </View>
             </TouchableOpacity>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.weekContainer}>
               {weekDays.map((day) => (
@@ -168,7 +171,9 @@ const MainScreen: React.FC = () => {
               ))}
             </ScrollView>
             <TouchableOpacity onPress={() => setSelectedDate(format(addDays(parseISO(selectedDate), 1), 'yyyy-MM-dd'))}>
-              <Text style={styles.arrowButton}>▶</Text>
+              <View style={styles.squareButton}>
+                <Text style={styles.squareBracket}>{'>'}</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -220,7 +225,11 @@ const MainScreen: React.FC = () => {
 const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator id={undefined} initialRouteName="Main" screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        id={undefined} 
+        initialRouteName="Main"
+        screenOptions={{ headerShown: false }}
+      >
         <Stack.Screen name="Main" component={MainScreen} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -228,13 +237,15 @@ const AppNavigator: React.FC = () => {
 };
 
 export default function App() {
-  return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Provider store={store}>
-        <AppNavigator />
-      </Provider>
-    </GestureHandlerRootView>
-  );
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <AppNavigator />
+          </PersistGate>
+        </Provider>
+      </GestureHandlerRootView>
+    );
 }
 
 const styles = StyleSheet.create({
@@ -252,29 +263,24 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   backButton: {
-    color: '#007AFF',
+    color: '#F6AE2D',
     fontSize: 16,
     marginBottom: 5,
+  },
+  weekNavigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   weekContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
   },
-  weekNavigationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  arrowButton: {
-    fontSize: 20,
-    color: '#007AFF',
-    paddingHorizontal: 10,
-  },
   dayButton: {
     alignItems: 'center',
-    marginHorizontal: 10,
-    paddingVertical: 5,
-    paddingHorizontal: 8,
+    marginHorizontal: 3,
+    minWidth: '12%',
+    paddingHorizontal: 5,
     borderRadius: 10,
     backgroundColor: '#f0f0f0',
   },
@@ -295,103 +301,18 @@ const styles = StyleSheet.create({
   dayDateActive: {
     color: '#fff',
   },
-  customSelectContainer: {
-    position: 'relative',
-    marginBottom: 5,
-  },
-  customSelect: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 8,
-    justifyContent: 'space-between',
-  },
-  customSelectText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  customSelectArrow: {
-    fontSize: 16,
-    color: '#333',
-    marginLeft: 10,
-  },
-  customSelectDropdown: {
-    position: 'absolute',
-    bottom: '100%',
-    left: 0,
-    right: 0,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    zIndex: 10,
-  },
-  customSelectOptionContainer: {
-    padding: 8,
-  },
-  customSelectOption: {
-    fontSize: 16,
-    color: '#333',
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-    marginTop: 5,
-  },
-  label: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#555',
-    marginBottom: 5,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 8,
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  row: {
-    flexDirection: 'row',
-  },
-  saveButton: {
-    backgroundColor: '#F6AE2D',
-    paddingVertical: 12,
-    marginHorizontal: 20,
-    marginTop: 30,
-    borderRadius: 30,
+  squareButton: {
+    width: 23,
+    height: 23,
+    backgroundColor: '#f0f0f0',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
+    borderRadius: 4,
+    marginHorizontal: 3,
   },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  deleteButton: {
-    backgroundColor: 'red',
-    justifyContent: 'center',
-    alignItems: 'flex-end',
-    padding: 20,
-  },
-  deleteButtonText: {
-    color: 'white',
+  squareBracket: {
+    color: '#F6AE2D',
+    fontSize: 12,
     fontWeight: 'bold',
-    fontSize: 18,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#888',
   },
 });
