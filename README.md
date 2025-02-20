@@ -1,4 +1,4 @@
-![Screenshot_4](https://github.com/voronine/calendarApp/blob/master/assets/screen.jpg)
+<img src="https://github.com/voronine/calendarApp/blob/master/assets/screen.jpg" width="300">
 
 
 # Calendar Event Scheduling App Documentation
