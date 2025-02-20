@@ -7,6 +7,7 @@ import {
   View,
   TouchableOpacity,
   Text,
+  TextInput
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -19,10 +20,8 @@ import EventList from './components/EventList';
 export default function MainScreen() {
   const dispatch = useDispatch();
   const events = useSelector((state: any) => state.events.events) as Event[];
-
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [viewMode, setViewMode] = useState<'calendar' | 'day'>('calendar');
-
   const [eventName, setEventName] = useState('');
   const [startTime, setStartTime] = useState(
     selectedDate === format(new Date(), 'yyyy-MM-dd') ? format(new Date(), 'HH:00') : '15:00'
@@ -81,6 +80,7 @@ export default function MainScreen() {
     setRepeatOption('Weekly');
     setIsEditing(false);
     setEditingEventId(null);
+    setViewMode('day');
   };
 
   const handleDeleteEvent = (id: string) => {
@@ -113,14 +113,17 @@ export default function MainScreen() {
   };
 
   const renderCalendarView = () => (
-    <CalendarComponent
-      currentDate={selectedDate}
-      onDayPress={(day) => {
-        setSelectedDate(day.dateString);
-        setViewMode('day');
-      }}
-      markedDates={computeMarkedDates()}
-    />
+    <View>
+      <Text>Calendar</Text>
+      <CalendarComponent
+        currentDate={selectedDate}
+        onDayPress={(day) => {
+          setSelectedDate(day.dateString);
+          setViewMode('day');
+        }}
+        markedDates={computeMarkedDates()}
+      />
+    </View>
   );
 
   const renderDayDetailView = () => {
@@ -142,7 +145,9 @@ export default function MainScreen() {
           </TouchableOpacity>
           <View style={styles.weekNavigationContainer}>
             <TouchableOpacity
-              onPress={() => setSelectedDate(format(addDays(parseISO(selectedDate), -1), 'yyyy-MM-dd'))}
+              onPress={() =>
+                setSelectedDate(format(addDays(parseISO(selectedDate), -1), 'yyyy-MM-dd'))
+              }
             >
               <View style={styles.squareButton}>
                 <Text style={styles.squareBracket}>{'<'}</Text>
@@ -165,7 +170,9 @@ export default function MainScreen() {
               ))}
             </ScrollView>
             <TouchableOpacity
-              onPress={() => setSelectedDate(format(addDays(parseISO(selectedDate), 1), 'yyyy-MM-dd'))}
+              onPress={() =>
+                setSelectedDate(format(addDays(parseISO(selectedDate), 1), 'yyyy-MM-dd'))
+              }
             >
               <View style={styles.squareButton}>
                 <Text style={styles.squareBracket}>{'>'}</Text>
