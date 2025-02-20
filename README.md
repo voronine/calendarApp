@@ -1,5 +1,5 @@
 
-![Screenshot_4](https://github.com/voronine/calendarApp/blob/main/src/assets/screen.jpg)
+![Screenshot_4](https://github.com/voronine/calendarApp/blob/main/assets/screen.jpg)
 
 
 
