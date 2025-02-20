@@ -7,7 +7,6 @@ import {
   View,
   TouchableOpacity,
   Text,
-  TextInput
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -35,19 +34,22 @@ export default function MainScreen() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const updateDefaultTimes = () => {
-      const now = new Date();
-      const todayStr = format(now, 'yyyy-MM-dd');
-      if (selectedDate === todayStr && !isEditing) {
-        setStartTime(format(now, 'HH:00'));
-        setEndTime(format(addHours(now, 1), 'HH:00'));
-      }
-    };
-    updateDefaultTimes();
-    const interval = setInterval(updateDefaultTimes, 60000);
-    return () => clearInterval(interval);
-  }, [selectedDate, isEditing]);
+// 1. useEffect for updating time defaults
+useEffect(() => {
+  // This function updates the startTime and endTime values
+  // if the selected date is today and editing mode is off.
+  const updateDefaultTimes = () => {
+    const now = new Date();
+    const todayStr = format(now, 'yyyy-MM-dd');
+    if (selectedDate === todayStr && !isEditing) {
+      setStartTime(format(now, 'HH:00'));
+      setEndTime(format(addHours(now, 1), 'HH:00'));
+    }
+  };
+  updateDefaultTimes();
+  const interval = setInterval(updateDefaultTimes, 60000);
+  return () => clearInterval(interval);
+}, [selectedDate, isEditing]);
 
   const handleSaveEvent = () => {
     if (!eventName.trim()) {
