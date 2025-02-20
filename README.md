@@ -1,6 +1,4 @@
-
-![Screenshot_4](https://github.com/voronine/calendarApp/blob/main/assets/screen.jpg)
-
+![Screenshot_4](https://github.com/voronine/calendarApp/blob/master/assets/screen.jpg)
 
 
 # Calendar Event Scheduling App Documentation
